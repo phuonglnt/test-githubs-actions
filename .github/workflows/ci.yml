@@ -1,0 +1,42 @@
+name: CI
+
+# Không có bộ test hình thức nào trong repo này - workflow này làm smoke test
+# tối thiểu: mọi file .py biên dịch được, DB tạo được từ đầu, và app Flask
+# khởi động + trả về /login = 200.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Compile check
+        run: python -m py_compile app.py auth.py models.py translations.py setup_db.py setup_users_db.py reset_and_start.py testdata.py
+
+      - name: Build fresh databases
+        run: |
+          python setup_db.py
+          python setup_users_db.py
+
+      - name: Boot the app and hit /login
+        run: |
+          python - <<'PY'
+          import app
+
+          client = app.app.test_client()
+          response = client.get("/login")
+          assert response.status_code == 200, f"unexpected status {response.status_code}"
+          print("Smoke test OK - /login returned 200")
+          PY
