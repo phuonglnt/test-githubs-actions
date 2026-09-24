@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ t('rep_title') }}{% endblock %}
+{% block content %}
+
+<div class="page">
+  <header class="page-header">
+    <div>
+      <a class="back-link" href="{{ url_for('table_map') }}">&larr; {{ t('ord_back') }}</a>
+      <h1 class="page-title">
+        <svg class="heading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        {{ t('rep_title') }}
+      </h1>
+      <p class="page-subtitle">{{ date_label }}</p>
+    </div>
+
+    <div class="grand-total-box">
+      <span class="grand-total-box__label">{{ t('rep_total_revenue') }}</span>
+      <span class="grand-total-box__value">{{ format_money(grand_total) }}</span>
+    </div>
+  </header>
+
+  <form class="filter-bar panel-box" method="GET" action="{{ url_for('reports') }}">
+    <select class="login-input filter-bar__select" name="period">
+      <option value="day" {{ 'selected' if period == 'day' }}>{{ t('rep_period_day') }}</option>
+      <option value="week" {{ 'selected' if period == 'week' }}>{{ t('rep_period_week') }}</option>
+      <option value="month" {{ 'selected' if period == 'month' }}>{{ t('rep_period_month') }}</option>
+    </select>
+    <input class="login-input" type="date" name="date" value="{{ selected_date }}">
+    <button class="login-button" type="submit">{{ t('rep_apply') }}</button>
+  </form>
+
+  <div class="report-layout">
+
+    <section class="report-column">
+      <h2 class="panel-heading">{{ t('rep_dine_in') }} ({{ dine_in_bills|length }} {{ t('rep_bills') }}) - {{ format_money(dine_in_total) }}</h2>
+      {% if dine_in_bills %}
+        {% for bill in dine_in_bills %}
+        <div class="report-bill-card">
+          <div class="report-bill-card__head">
+            <span>{{ bill.bill_code }}</span>
+            <span>{{ bill.paid_at }}</span>
+          </div>
+          <ul class="report-bill-card__items">
+            {% for item in bill.line_items %}
+            <li>{{ item['name_dish'] }} &times;{{ item['dish_quantity'] }} — {{ format_money(item['total_dish']) }}</li>
+            {% endfor %}
+          </ul>
+          <div class="report-bill-card__total">{{ format_money(bill.total_bill) }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+      <p class="empty-state">{{ t('rep_no_dine_in') }}</p>
+      {% endif %}
+    </section>
+
+    <section class="report-column">
+      <h2 class="panel-heading">{{ t('rep_takeaway') }} ({{ takeaway_bills|length }} {{ t('rep_bills') }}) - {{ format_money(takeaway_total) }}</h2>
+      {% if takeaway_bills %}
+        {% for bill in takeaway_bills %}
+        <div class="report-bill-card">
+          <div class="report-bill-card__head">
+            <span>{{ bill.bill_code }}</span>
+            <span>{{ bill.paid_at }}</span>
+          </div>
+          <ul class="report-bill-card__items">
+            {% for item in bill.line_items %}
+            <li>{{ item['name_dish'] }} &times;{{ item['dish_quantity'] }} — {{ format_money(item['total_dish']) }}</li>
+            {% endfor %}
+          </ul>
+          <div class="report-bill-card__total">{{ format_money(bill.total_bill) }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+      <p class="empty-state">{{ t('rep_no_takeaway') }}</p>
+      {% endif %}
+    </section>
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ t('mm_title') }}{% endblock %}
+{% block content %}
+
+<div class="page">
+  <header class="page-header">
+    <div>
+      <a class="back-link" href="{{ url_for('table_map') }}">&larr; {{ t('ord_back') }}</a>
+      <h1 class="page-title">
+        <svg class="heading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a2 2 0 0 0 4 0V3M8 10v11M18 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>
+        {{ t('mm_title') }}
+      </h1>
+      <p class="page-subtitle">{{ t('mm_subtitle') }}</p>
+    </div>
+  </header>
+
+  {% if error %}
+  <p class="login-error">{{ error }}</p>
+  {% endif %}
+
+  <datalist id="dish-cat-suggestions">
+    {% for cat in category_suggestions %}<option value="{{ cat }}"></option>{% endfor %}
+  </datalist>
+
+  <div class="manage-layout">
+
+    <section class="manage-section">
+      <h2 class="panel-heading">{{ t('mm_add_dish') }}</h2>
+      <form class="inline-form" method="POST" action="{{ url_for('manage_menu') }}">
+        <input type="hidden" name="action" value="add_dish">
+        <input class="login-input" type="text" name="name_dish" placeholder="{{ t('mm_dish_name_ph') }}" required>
+        <input class="login-input inline-form__type" type="text" name="type" list="dish-cat-suggestions" placeholder="{{ t('mm_category_ph') }}">
+        <input class="login-input inline-form__price" type="number" step="1000" min="0" name="price" placeholder="{{ t('mm_price_ph') }}" required>
+        <label class="checkbox-label"><input type="checkbox" name="is_vegetable"> {{ t('mm_vegetarian') }}</label>
+        <button class="login-button" type="submit">{{ t('mm_add_dish_button') }}</button>
+      </form>
+
+      <h2 class="panel-heading panel-heading--spaced">{{ t('mm_current_dishes') }}</h2>
+      <div class="dish-manage-list">
+        {% for d in dishes %}
+        <form class="dish-manage-row {{ 'dish-manage-row--inactive' if not d['is_active'] }}" method="POST" action="{{ url_for('manage_menu') }}">
+          <input type="hidden" name="menu_id" value="{{ d['ID'] }}">
+          <input class="login-input dish-manage-name" type="text" name="name_dish" value="{{ d['name_dish'] }}">
+          <input class="login-input dish-manage-type" type="text" name="type" list="dish-cat-suggestions" value="{{ d['type'] or '' }}">
+          <input class="login-input dish-manage-price" type="number" step="1000" min="0" name="price" value="{{ d['price']|int }}">
+          <label class="checkbox-label"><input type="checkbox" name="is_vegetable" {{ 'checked' if d['is_vegetable'] }}> {{ t('mm_veg_short') }}</label>
+
+          <div class="row-actions">
+            <button class="mini-button" type="submit" name="action" value="edit_dish">{{ t('mm_save') }}</button>
+
+            {% if d['is_active'] %}
+            <button class="mini-button mini-button--danger" type="submit" name="action" value="deactivate_dish">{{ t('mm_remove') }}</button>
+            {% else %}
+            <span class="dish-manage-status">{{ t('mm_removed') }}</span>
+            <button class="mini-button" type="submit" name="action" value="reactivate_dish">{{ t('mm_restore') }}</button>
+            {% endif %}
+          </div>
+        </form>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="manage-section">
+      <h2 class="panel-heading">{{ t('mm_add_table') }}</h2>
+      <form class="inline-form" method="POST" action="{{ url_for('manage_menu') }}">
+        <input type="hidden" name="action" value="add_table">
+        <input class="login-input" type="number" min="1" name="seat_count" placeholder="{{ t('mm_seats_ph') }}" required>
+        <button class="login-button" type="submit">{{ t('mm_add_table_button') }}</button>
+      </form>
+
+      <h2 class="panel-heading panel-heading--spaced">{{ t('mm_current_tables') }}</h2>
+      <div class="dish-manage-list">
+        {% for tbl in tables %}
+        <form class="table-manage-row" method="POST" action="{{ url_for('manage_menu') }}">
+          <input type="hidden" name="table_id" value="{{ tbl['Table_number'] }}">
+          <span class="table-manage-row__label">{{ t('mm_table') }} {{ tbl['Table_number'] }}</span>
+          <input class="login-input table-manage-row__seats" type="number" name="seat_count" value="{{ tbl['seat_count'] }}" min="1">
+          <span class="table-manage-row__status">{{ t('status_in_use') if tbl['status'] != 'available' else t('status_available') }}</span>
+          <div class="row-actions">
+            <button class="mini-button" type="submit" name="action" value="edit_table">{{ t('mm_save') }}</button>
+            <button class="mini-button mini-button--danger" type="submit" name="action" value="delete_table">{{ t('mm_delete') }}</button>
+          </div>
+        </form>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+</div>
+
+{% endblock %}

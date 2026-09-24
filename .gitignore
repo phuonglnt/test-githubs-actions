@@ -1,0 +1,14 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Local databases - contain real password hashes / order data.
+# Recreate them with: python setup_db.py && python setup_users_db.py
+# (or python reset_and_start.py to wipe + recreate + start the app)
+*.db

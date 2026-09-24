@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ t('ord_takeaway_title') if table_id is none else t('ord_table') + ' ' + table_id|string }}{% endblock %}
+{% block content %}
+
+<div class="page">
+  <header class="page-header page-header--order">
+    <a class="back-link" href="{{ url_for('table_map') }}">&larr; {{ t('ord_back') }}</a>
+    <h1 class="page-title">{{ t('ord_takeaway_title') if table_id is none else t('ord_table') + ' ' + table_id|string }}</h1>
+  </header>
+
+  <div class="order-layout">
+
+    <section class="menu-panel">
+      <h2 class="panel-heading">
+        <svg class="heading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a2 2 0 0 0 4 0V3M8 10v11M18 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>
+        {{ t('ord_menu') }}
+      </h2>
+
+      {% if dish_categories %}
+      <div class="category-tabs" id="category-tabs">
+        <button class="category-tab category-tab--active" data-category="all">{{ t('ord_show_all') }}</button>
+        {% for cat in dish_categories %}
+        <button class="category-tab" data-category="{{ cat }}">{{ cat }}</button>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="dish-grid" id="dish-grid">
+        {% for d in dishes %}
+        <button class="dish-card" data-menu-id="{{ d['ID'] }}" data-dish-name="{{ d['name_dish'] }}" data-category="{{ d['type'] or '' }}">
+          <span class="dish-card__name">{{ d['name_dish'] }}</span>
+          <span class="dish-card__price">{{ format_money(d['price']) }}</span>
+        </button>
+        {% endfor %}
+      </div>
+    </section>
+
+    <aside class="receipt" data-bill-id="{{ bill_id }}"
+           data-i18n-add-failed="{{ t('ord_add_failed') }}"
+           data-i18n-pay-failed="{{ t('ord_pay_failed') }}"
+           data-i18n-pay-success="{{ t('ord_pay_success') }}">
+      <div class="receipt__perforation"></div>
+      <div class="receipt__body">
+        <p class="receipt__label">
+          <svg class="heading-icon heading-icon--muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>
+          {{ t('ord_ticket') }}
+        </p>
+        <p class="receipt__code">{{ bill_code }}</p>
+        <p class="receipt__table">{{ t('rep_takeaway') if table_id is none else t('ord_table') + ' ' + table_id|string }}</p>
+        <div class="receipt__divider"></div>
+
+        <ul class="receipt__items" id="receipt-items">
+          {% for item in items %}
+          <li class="receipt__line">
+            <span class="receipt__line-name">{{ item['name_dish'] }} &times;{{ item['dish_quantity'] }}</span>
+            <span class="receipt__line-price">{{ format_money(item['total_dish']) }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        <div class="receipt__divider receipt__divider--dashed"></div>
+
+        <div class="receipt__total">
+          <span>{{ t('ord_total') }}</span>
+          <span id="receipt-total">{{ format_money(total) }}</span>
+        </div>
+
+        <button class="pay-button" id="pay-button">{{ t('ord_pay') }}</button>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='order.js') }}"></script>
+{% endblock %}

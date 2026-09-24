@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ t('stf_title') }}{% endblock %}
+{% block content %}
+
+<div class="page">
+  <header class="page-header">
+    <div>
+      <a class="back-link" href="{{ url_for('table_map') }}">&larr; {{ t('ord_back') }}</a>
+      <h1 class="page-title">
+        <svg class="heading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="8" r="2.5"/><path d="M15 13.5c2.5.3 4.5 2 4.5 4.5"/></svg>
+        {{ t('stf_title') }}
+      </h1>
+      <p class="page-subtitle">{{ t('stf_subtitle') }}</p>
+    </div>
+  </header>
+
+  <div class="staff-layout">
+    <form class="staff-form" method="POST" action="{{ url_for('staff_management') }}">
+      <h2 class="panel-heading">{{ t('stf_add_new') }}</h2>
+
+      {% if error %}
+      <p class="login-error">{{ error }}</p>
+      {% endif %}
+
+      <label class="login-label">{{ t('login_username') }}</label>
+      <input class="login-input" type="text" name="username" required>
+
+      <label class="login-label">{{ t('login_password') }}</label>
+      <input class="login-input" type="password" name="password" required>
+
+      <button class="login-button" type="submit">{{ t('stf_add_button') }}</button>
+    </form>
+
+    <div class="staff-list">
+      <h2 class="panel-heading">{{ t('stf_existing') }}</h2>
+      {% if staff_list %}
+      <div class="dish-manage-list">
+        {% for s in staff_list %}
+        <form class="table-manage-row" method="POST" action="{{ url_for('staff_management') }}">
+          <input type="hidden" name="action" value="edit_staff">
+          <input type="hidden" name="user_id" value="{{ s['id'] }}">
+          <span class="staff-avatar" style="background:{{ s['avatar_color'] }}">
+            {{ s['username'][0]|upper }}
+          </span>
+          <input class="login-input table-manage-row__label" type="text" name="username" value="{{ s['username'] }}">
+          <input class="login-input table-manage-row__password" type="password" name="new_password" placeholder="{{ t('stf_new_password_ph') }}">
+          <button class="mini-button" type="submit">{{ t('mm_save') }}</button>
+        </form>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="empty-state">{{ t('stf_none') }}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

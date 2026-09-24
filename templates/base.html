@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="{{ current_language }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Restaurant{% endblock %}</title>
+<script>
+  /* Đặt theme TRƯỚC khi trang vẽ để không bị nháy sáng->tối.
+     Mặc định là nền sáng; chỉ dùng nền tối khi người dùng tự bật (lưu ở localStorage). */
+  (function () {
+    try {
+      if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    } catch (e) {}
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+{% if session.user_id %}
+<nav class="topbar">
+  <a class="topbar__brand" href="{{ url_for('table_map') }}">Restaurant de Valentine</a>
+
+  <div class="topbar__right">
+
+  <div class="lang-switch" title="{{ t('nav_language') }}">
+    {% for code in languages %}
+    <button class="lang-switch__option {{ 'lang-switch__option--active' if code == current_language }}"
+            data-language="{{ code }}" title="{{ language_names[code] }}">{{ code|upper }}</button>
+    {% endfor %}
+  </div>
+
+  <button class="theme-toggle" id="theme-toggle" type="button"
+          title="{{ t('nav_theme') }}" aria-label="{{ t('nav_theme') }}">
+    <svg class="theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg class="theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+  </button>
+
+  <div class="topbar__avatar-wrap">
+    <button class="topbar__avatar" id="avatar-button" style="background: {{ session.avatar_color }}">
+      {{ session.username[0]|upper }}
+    </button>
+
+    <div class="avatar-dropdown" id="avatar-dropdown">
+      <p class="avatar-dropdown__name">{{ session.username }}</p>
+      <p class="avatar-dropdown__role">{{ t('role_owner') if session.role == 'owner' else t('role_staff') }}</p>
+
+      <div class="avatar-dropdown__divider"></div>
+
+      <p class="avatar-dropdown__label">{{ t('nav_change_avatar') }}</p>
+      <div class="avatar-swatches">
+        {% for color in avatar_colors %}
+        <button class="avatar-swatch" data-color="{{ color }}" style="background:{{ color }}"></button>
+        {% endfor %}
+      </div>
+
+      <div class="avatar-dropdown__divider"></div>
+
+      <p class="avatar-dropdown__label">
+        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg>
+        {{ t('nav_currency') }}
+      </p>
+      <div class="currency-options">
+        {% for c in currencies %}
+        <button class="currency-option {{ 'currency-option--active' if c == current_currency }}" data-currency="{{ c }}">{{ c }}</button>
+        {% endfor %}
+      </div>
+
+      {% if session.role == 'owner' %}
+      <div class="avatar-dropdown__divider"></div>
+      <a class="avatar-dropdown__link" href="{{ url_for('staff_management') }}">
+        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="8" r="2.5"/><path d="M15 13.5c2.5.3 4.5 2 4.5 4.5"/></svg>
+        {{ t('nav_manage_staff') }}
+      </a>
+      <a class="avatar-dropdown__link" href="{{ url_for('manage_menu') }}">
+        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a2 2 0 0 0 4 0V3M8 10v11M18 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>
+        {{ t('nav_manage_menu') }}
+      </a>
+      {% endif %}
+
+      <div class="avatar-dropdown__divider"></div>
+      <a class="avatar-dropdown__link" href="{{ url_for('reports') }}">
+        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        {{ t('nav_sales_report') }}
+      </a>
+
+      <div class="avatar-dropdown__divider"></div>
+      <a class="avatar-dropdown__link avatar-dropdown__link--danger" href="{{ url_for('logout') }}">
+        <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+        {{ t('nav_logout') }}
+      </a>
+    </div>
+  </div>
+
+  </div>
+</nav>
+<script src="{{ url_for('static', filename='topbar.js') }}"></script>
+{% endif %}
+
+{% block content %}{% endblock %}
+</body>
+</html>
