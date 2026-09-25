@@ -103,6 +103,23 @@ def update_staff_account(user_id, username, new_password=None):
         conn.close()
 
 
+def reset_owner_account(username, password):
+    """Xoá MỌI tài khoản role='owner' hiện có rồi tạo lại đúng 1 cái mới với
+    username/password chỉ định. Dùng khi deploy bị lệch DATABASE_URL nên
+    seed_owner_account() cứ thấy "already exists" mà bỏ qua - route
+    /admin/reset-owner trong app.py gọi hàm này để sửa trực tiếp, không cần
+    psql/Shell."""
+    conn = get_connection()
+    cur = dbcompat.cursor(conn)
+    cur.execute("DELETE FROM Users WHERE role = 'owner'")
+    cur.execute(
+        "INSERT INTO Users (username, password_hash, role) VALUES (?, ?, 'owner')",
+        (username, generate_password_hash(password, method="pbkdf2:sha256"))
+    )
+    conn.commit()
+    conn.close()
+
+
 def update_avatar_color(user_id, color):
     conn = get_connection()
     dbcompat.cursor(conn).execute("UPDATE Users SET avatar_color = ? WHERE id = ?", (color, user_id))

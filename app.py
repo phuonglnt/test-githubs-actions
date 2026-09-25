@@ -4,13 +4,16 @@ Flask backend cho hệ thống order nhà hàng, có đăng nhập + phân quy�
 (owner / staff) dùng users.db riêng biệt.
 """
 
+import hmac
+import os
 from datetime import date, datetime, timedelta
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from models import MenuManager, TableManager, BillManager, ReportManager
 from auth import (
     find_user_by_username, verify_password, create_staff_account,
     get_all_staff, update_staff_account, update_avatar_color,
-    update_user_currency, update_user_language, AVATAR_COLORS, CURRENCIES,
+    update_user_currency, update_user_language, reset_owner_account,
+    AVATAR_COLORS, CURRENCIES,
     login_required, owner_required,
 )
 from translations import (
@@ -485,6 +488,26 @@ def pay_bill(bill_id):
     total = bill_mgr.close_bill(bill_id)
     bill_mgr.close()
     return jsonify({"total_formatted": format_money(total)})
+
+
+# ---------- Bootstrap: reset tài khoản owner khi deploy bị lệch DB ----------
+# Chỉ hoạt động khi có biến môi trường ADMIN_RESET_TOKEN (không set thì route
+# này coi như không tồn tại, trả 404). Xoá route này khỏi code sau khi dùng
+# xong nếu muốn dọn sạch, không bắt buộc vì đã khoá bằng token.
+@app.route("/admin/reset-owner")
+def admin_reset_owner():
+    expected_token = os.environ.get("ADMIN_RESET_TOKEN")
+    if not expected_token:
+        return "Not found", 404
+
+    given_token = request.args.get("token", "")
+    if not hmac.compare_digest(given_token, expected_token):
+        return "Forbidden", 403
+
+    username = os.environ.get("OWNER_USERNAME", "owner")
+    password = os.environ.get("OWNER_PASSWORD", "owner123")
+    reset_owner_account(username, password)
+    return f"OK - tài khoản owner đã được reset. Đăng nhập bằng username: {username}"
 
 
 if __name__ == "__main__":
