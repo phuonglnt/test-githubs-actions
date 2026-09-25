@@ -106,6 +106,11 @@ class BillManager(Database):
         # Format: EI-HHMM-DDMMYYYY-NN or TA-HHMM-DDMMYYYY-NN
         bill_code = f"{bill_type_prefix}-{now.strftime('%H%M')}-{now.strftime('%d%m%Y')}-{order_number_today:02d}"
 
+        # Chỉ tạo bill (phiếu tạm) ở đây - KHÔNG đổi trạng thái bàn sang
+        # "in_use" tại đây. Trước đây mở màn gọi món (kể cả bấm nhầm rồi
+        # back ra ngay) đã tự động biến bàn thành "Occupied" dù chưa gọi
+        # món nào. Bàn chỉ thực sự chuyển "Occupied" khi có món đầu tiên
+        # được thêm vào - xem add_item_to_bill().
         bill_id = dbcompat.insert_returning_id(
             self.cursor,
             "INSERT INTO Bill (bill_code, table_id, is_eat_in, tax) VALUES (?, ?, ?, ?)",
@@ -113,10 +118,6 @@ class BillManager(Database):
             "Bill_id",
         )
         self.conn.commit()
-
-        if table_id is not None:
-            self.cursor.execute("UPDATE Table_info SET status = 'in_use' WHERE table_number = ?", (table_id,))
-            self.conn.commit()
         return bill_id
 
     def add_item_to_bill(self, bill_id, menu_id, dish_quantity):
@@ -146,6 +147,16 @@ class BillManager(Database):
                 "INSERT INTO Order_info (bill_id, menu_id, dish_quantity, total_dish) VALUES (?, ?, ?, ?)",
                 (bill_id, menu_id, dish_quantity, price * dish_quantity)
             )
+
+        # Có món thật được gọi rồi - giờ mới đánh dấu bàn đang dùng (đơn
+        # mang về có table_id NULL nên bỏ qua).
+        self.cursor.execute("SELECT table_id FROM Bill WHERE Bill_id = ?", (bill_id,))
+        bill_row = self.cursor.fetchone()
+        if bill_row and bill_row["table_id"] is not None:
+            self.cursor.execute(
+                "UPDATE Table_info SET status = 'in_use' WHERE Table_number = ?", (bill_row["table_id"],)
+            )
+
         self.conn.commit()
 
     def get_open_bill_for_table(self, table_id):
