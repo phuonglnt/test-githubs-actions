@@ -9,13 +9,19 @@ Deploy lên Render (có biến môi trường DATABASE_URL): dùng Postgres thay
 sqlite, vì ổ đĩa Render bị xoá mỗi lần service khởi động lại.
 """
 
+import os
+
 import dbcompat
 from werkzeug.security import generate_password_hash
 
 USERS_DB = "users.db"
 
-DEFAULT_OWNER_USERNAME = "owner"
-DEFAULT_OWNER_PASSWORD = "owner123"  # đổi ngay sau khi bàn giao thật
+# Đọc từ biến môi trường OWNER_USERNAME / OWNER_PASSWORD nếu có (đặt trong
+# Render: Environment -> Add Environment Variable) - để KHÔNG BAO GIỜ phải
+# hardcode mật khẩu thật vào file này rồi commit lên GitHub. Không set thì
+# rơi về mặc định owner/owner123 như cũ, chạy local không đổi gì.
+DEFAULT_OWNER_USERNAME = os.environ.get("OWNER_USERNAME", "owner")
+DEFAULT_OWNER_PASSWORD = os.environ.get("OWNER_PASSWORD", "owner123")  # đổi ngay sau khi bàn giao thật
 
 
 def create_users_table():
@@ -68,8 +74,9 @@ def seed_owner_account(conn):
         (DEFAULT_OWNER_USERNAME, generate_password_hash(DEFAULT_OWNER_PASSWORD, method="pbkdf2:sha256"))
     )
     conn.commit()
-    print(f"Default owner account created -> username: {DEFAULT_OWNER_USERNAME} | password: {DEFAULT_OWNER_PASSWORD}")
-    print("NOTE: there is no in-app password change feature yet. To change it, edit users.db directly.")
+    password_source = "OWNER_PASSWORD env var" if os.environ.get("OWNER_PASSWORD") else "built-in default (owner123)"
+    print(f"Default owner account created -> username: {DEFAULT_OWNER_USERNAME} | password from: {password_source}")
+    print("NOTE: there is no in-app password change feature yet. To change it, edit the DB directly.")
 
 
 if __name__ == "__main__":
