@@ -737,7 +737,7 @@ select.login-input {
    individual parts just read as mud otherwise. */
 .chair-icon { width: 13px; height: 13px; }
 .chair-icon path,
-.chair-icon rect { fill: var(--text-subtle); }
+.chair-icon rect { fill: #8B5E3C; }
 
 .table-card__seats,
 .table-card__seats-label {
