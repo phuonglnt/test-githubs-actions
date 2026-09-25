@@ -6,3 +6,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 MarkupSafe==3.0.3
 Werkzeug==3.1.8
+# psycopg2 - chỉ thực sự cần khi deploy với Postgres (biến môi trường
+# DATABASE_URL, xem dbcompat.py). Cài luôn kể cả chạy sqlite ở local để
+# import không bao giờ vỡ, và để CI test được cả 2 đường.
+psycopg2-binary==2.9.10

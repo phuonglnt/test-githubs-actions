@@ -1,37 +1,51 @@
 """
 setup_db.py
-Creates the restaurant.db file and its tables based on the ERD design.
+Creates the restaurant.db tables based on the ERD design.
 Run this file once to initialize the database.
+
+Local (mặc định): tạo file restaurant.db bằng sqlite3.
+Deploy lên Render (có biến môi trường DATABASE_URL): tạo cùng các bảng đó
+trong Postgres thay vì sqlite - vì ổ đĩa Render bị xoá mỗi lần service
+khởi động lại nên không thể dùng file sqlite ở đó.
 """
 
-import sqlite3
+import dbcompat
 
 DB_NAME = "restaurant.db"
 
 
 def create_connection():
-    """Connect to SQLite and enable foreign key constraints (off by default)."""
-    conn = sqlite3.connect(DB_NAME)
-    conn.execute("PRAGMA foreign_keys = ON;")
+    """Kết nối DB và bật ràng buộc khoá ngoại (sqlite tắt mặc định; Postgres
+    luôn bật sẵn nên không cần làm gì thêm)."""
+    conn = dbcompat.connect(DB_NAME)
+    if not dbcompat.IS_POSTGRES:
+        conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
 
 def create_tables(conn):
     cursor = conn.cursor()
 
+    if dbcompat.IS_POSTGRES:
+        id_type = "SERIAL PRIMARY KEY"
+        timestamp_default = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+    else:
+        id_type = "INTEGER PRIMARY KEY AUTOINCREMENT"
+        timestamp_default = "TEXT DEFAULT (datetime('now', 'localtime'))"
+
     # Table_info (restaurant tables)
-    cursor.execute("""
+    cursor.execute(f"""
     CREATE TABLE IF NOT EXISTS Table_info (
-        Table_number INTEGER PRIMARY KEY AUTOINCREMENT,
+        Table_number {id_type},
         seat_count   INTEGER NOT NULL,
         status       TEXT NOT NULL DEFAULT 'available'
     );
     """)
 
     # Menu (list of dishes)
-    cursor.execute("""
+    cursor.execute(f"""
     CREATE TABLE IF NOT EXISTS Menu (
-        ID            INTEGER PRIMARY KEY AUTOINCREMENT,
+        ID            {id_type},
         name_dish     TEXT NOT NULL,
         type          TEXT,
         price         REAL NOT NULL,
@@ -41,14 +55,14 @@ def create_tables(conn):
     """)
 
     # Bill (invoice)
-    cursor.execute("""
+    cursor.execute(f"""
     CREATE TABLE IF NOT EXISTS Bill (
-        Bill_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+        Bill_id     {id_type},
         bill_code   TEXT,
         table_id    INTEGER,
         total_bill  REAL DEFAULT 0,
-        create_at   TEXT DEFAULT (datetime('now', 'localtime')),
-        paid_at     TEXT,
+        create_at   {timestamp_default},
+        paid_at     TIMESTAMP,
         is_paid     INTEGER NOT NULL DEFAULT 0,
         is_eat_in   INTEGER NOT NULL DEFAULT 1,
         tax         REAL DEFAULT 0,
@@ -57,9 +71,9 @@ def create_tables(conn):
     """)
 
     # Order_info (line items in a bill)
-    cursor.execute("""
+    cursor.execute(f"""
     CREATE TABLE IF NOT EXISTS Order_info (
-        Order_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+        Order_id       {id_type},
         bill_id        INTEGER NOT NULL,
         menu_id        INTEGER NOT NULL,
         dish_quantity  INTEGER NOT NULL DEFAULT 1,
@@ -75,24 +89,16 @@ def create_tables(conn):
 
 def migrate_add_is_active_column(conn):
     """For databases created before is_active existed: add the column safely."""
-    cursor = conn.cursor()
-    cursor.execute("PRAGMA table_info(Menu)")
-    existing_columns = [row[1] for row in cursor.fetchall()]
-
-    if "is_active" not in existing_columns:
-        cursor.execute("ALTER TABLE Menu ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1")
+    if not dbcompat.column_exists(conn, "Menu", "is_active"):
+        conn.cursor().execute("ALTER TABLE Menu ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1")
         conn.commit()
         print("Migrated: added is_active column to Menu")
 
 
 def migrate_add_bill_code_column(conn):
     """For databases created before bill_code existed: add the column safely."""
-    cursor = conn.cursor()
-    cursor.execute("PRAGMA table_info(Bill)")
-    existing_columns = [row[1] for row in cursor.fetchall()]
-
-    if "bill_code" not in existing_columns:
-        cursor.execute("ALTER TABLE Bill ADD COLUMN bill_code TEXT")
+    if not dbcompat.column_exists(conn, "Bill", "bill_code"):
+        conn.cursor().execute("ALTER TABLE Bill ADD COLUMN bill_code TEXT")
         conn.commit()
         print("Migrated: added bill_code column to Bill")
 
@@ -103,4 +109,4 @@ if __name__ == "__main__":
     migrate_add_is_active_column(conn)
     migrate_add_bill_code_column(conn)
     conn.close()
-    print(f"Database ready at: {DB_NAME}")
+    print(f"Database ready ({'Postgres' if dbcompat.IS_POSTGRES else DB_NAME}).")

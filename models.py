@@ -1,27 +1,30 @@
-import sqlite3
 from datetime import datetime
+
+import dbcompat
 
 DB_NAME = 'restaurant.db'
 
 class Database:
     def __init__(self):
-        self.conn = sqlite3.connect(DB_NAME)
-        self.conn.execute("PRAGMA foreign_keys = 1")
-        self.conn.row_factory = sqlite3.Row
+        self.conn = dbcompat.connect(DB_NAME)
+        if not dbcompat.IS_POSTGRES:
+            self.conn.execute("PRAGMA foreign_keys = 1")
 
-        self.cursor = self.conn.cursor()
-    
+        self.cursor = dbcompat.cursor(self.conn)
+
     def close(self):
         self.conn.close()
 
 class MenuManager(Database):
     def add_menu_item(self, name_dish, type_, price, is_vegetable=0):
-        self.cursor.execute(
+        new_id = dbcompat.insert_returning_id(
+            self.cursor,
             "INSERT INTO Menu (name_dish, type, price, is_vegetable) VALUES (?, ?, ?, ?)",
-            (name_dish, type_, price, is_vegetable)
+            (name_dish, type_, price, is_vegetable),
+            "ID",
         )
         self.conn.commit()
-        return self.cursor.lastrowid
+        return new_id
 
     def get_menu(self):
         """Dishes shown to customers when ordering - active dishes only."""
@@ -54,12 +57,14 @@ class MenuManager(Database):
 
 class TableManager(Database):
     def add_table(self, seat_count, status='available'):
-        self.cursor.execute(
+        new_id = dbcompat.insert_returning_id(
+            self.cursor,
             "INSERT INTO Table_info (seat_count, status) VALUES (?, ?)",
-            (seat_count, status)
+            (seat_count, status),
+            "Table_number",
         )
         self.conn.commit()
-        return self.cursor.lastrowid
+        return new_id
 
     def get_tables(self):
         self.cursor.execute("SELECT * FROM Table_info")
@@ -83,7 +88,7 @@ class TableManager(Database):
             self.cursor.execute("DELETE FROM Table_info WHERE Table_number = ?", (table_id,))
             self.conn.commit()
             return True, None
-        except sqlite3.IntegrityError:
+        except dbcompat.IntegrityError:
             return False, "err_table_has_history"
 
 class BillManager(Database):
@@ -92,8 +97,8 @@ class BillManager(Database):
 
         # Count how many bills already exist today to get this bill's order number of the day
         today_str = now.strftime("%Y-%m-%d")
-        self.cursor.execute("SELECT COUNT(*) FROM Bill WHERE DATE(create_at) = ?", (today_str,))
-        order_number_today = self.cursor.fetchone()[0] + 1
+        self.cursor.execute("SELECT COUNT(*) AS cnt FROM Bill WHERE DATE(create_at) = ?", (today_str,))
+        order_number_today = self.cursor.fetchone()["cnt"] + 1
 
         # Prefix EI (eat-in) or TA (takeaway) so bill codes are distinguishable at a glance
         bill_type_prefix = "EI" if is_eat_in else "TA"
@@ -101,12 +106,13 @@ class BillManager(Database):
         # Format: EI-HHMM-DDMMYYYY-NN or TA-HHMM-DDMMYYYY-NN
         bill_code = f"{bill_type_prefix}-{now.strftime('%H%M')}-{now.strftime('%d%m%Y')}-{order_number_today:02d}"
 
-        self.cursor.execute(
+        bill_id = dbcompat.insert_returning_id(
+            self.cursor,
             "INSERT INTO Bill (bill_code, table_id, is_eat_in, tax) VALUES (?, ?, ?, ?)",
-            (bill_code, table_id, is_eat_in, tax)
+            (bill_code, table_id, is_eat_in, tax),
+            "Bill_id",
         )
         self.conn.commit()
-        bill_id = self.cursor.lastrowid
 
         if table_id is not None:
             self.cursor.execute("UPDATE Table_info SET status = 'in_use' WHERE table_number = ?", (table_id,))
@@ -161,7 +167,7 @@ class BillManager(Database):
             FROM Order_info
             JOIN Menu ON Order_info.menu_id = Menu.ID
             WHERE Order_info.bill_id = ?
-            GROUP BY Order_info.menu_id
+            GROUP BY Order_info.menu_id, Menu.name_dish
             ORDER BY MIN(Order_info.Order_id)
         """, (bill_id,))
         return self.cursor.fetchall()
@@ -175,9 +181,9 @@ class BillManager(Database):
         tax = bill_row["tax"] if bill_row else 0
 
         self.cursor.execute(
-            "SELECT SUM(total_dish) FROM Order_info WHERE bill_id = ?", (bill_id,)
+            "SELECT SUM(total_dish) AS subtotal FROM Order_info WHERE bill_id = ?", (bill_id,)
         )
-        subtotal = self.cursor.fetchone()[0] or 0
+        subtotal = self.cursor.fetchone()["subtotal"] or 0
 
         return subtotal * (1 + tax)
 
