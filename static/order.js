@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (!res.ok) {
-        alert(MSG.addFailed);
+        showToast(MSG.addFailed, "error");
         return;
       }
 
@@ -58,12 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.error || MSG.payFailed);
+      showToast(data.error || MSG.payFailed, "error");
       return;
     }
 
-    alert(`${MSG.paySuccess} ${data.total_formatted}`);
-    window.location.href = "/";
+    showToast(`${MSG.paySuccess} ${data.total_formatted}`, "success");
+    setTimeout(() => { window.location.href = "/"; }, 1100);
   });
 
   // Category tabs - filter which dish cards are visible, no page reload

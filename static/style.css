@@ -1215,3 +1215,50 @@ select.login-input {
 
 /* single Save button on the staff edit rows - keep it right-aligned too */
 .table-manage-row > .mini-button:last-child { margin-left: auto; }
+
+/* ========================================================================= */
+/* Toast - thay cho alert() mặc định của trình duyệt                        */
+/* ========================================================================= */
+
+.toast-stack {
+  position: fixed;
+  top: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(380px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  pointer-events: auto;
+  animation: toast-in 0.2s ease;
+}
+.toast--error   { border-left-color: var(--danger); }
+.toast--success { border-left-color: var(--success); }
+
+.toast--leaving { animation: toast-out 0.16s ease forwards; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(-6px); }
+}

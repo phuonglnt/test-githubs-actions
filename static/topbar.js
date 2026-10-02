@@ -1,6 +1,32 @@
 // topbar.js
 // Mở/đóng dropdown khi bấm avatar, và gọi API đổi màu avatar khi chọn swatch.
 
+// Toast nhỏ gọn thay cho alert() của trình duyệt - không chặn thao tác,
+// tự biến mất, dùng chung cho mọi trang (gọi window.showToast(...) ở bất
+// kỳ script nào khác, ví dụ order.js).
+function ensureToastStack() {
+  let stack = document.querySelector(".toast-stack");
+  if (!stack) {
+    stack = document.createElement("div");
+    stack.className = "toast-stack";
+    document.body.appendChild(stack);
+  }
+  return stack;
+}
+
+window.showToast = function (message, type, duration) {
+  const stack = ensureToastStack();
+  const toast = document.createElement("div");
+  toast.className = `toast toast--${type || "info"}`;
+  toast.textContent = message;
+  stack.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("toast--leaving");
+    toast.addEventListener("animationend", () => toast.remove());
+  }, duration || 3200);
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const avatarButton = document.getElementById("avatar-button");
   const dropdown = document.getElementById("avatar-dropdown");
