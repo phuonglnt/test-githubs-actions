@@ -21,10 +21,10 @@
   --text-subtle: #A79C89;
 
   /* Brand + status */
-  --accent:        #7D1F3D;   /* wine / burgundy - fits "de Valentine"     */
-  --accent-hover:  #611730;
+  --accent:        #E0602B;   /* burnt orange / terracotta                 */
+  --accent-hover:  #C64F1F;
   --accent-ink:    #FFFFFF;   /* text on accent                           */
-  --accent-soft:   #F6E3E9;   /* tinted background                        */
+  --accent-soft:   #FBE9DE;   /* tinted background                        */
 
   --success:       #3E7B57;
   --success-soft:  #E4EFE7;
@@ -33,7 +33,7 @@
   --danger-soft:   #F9E7E1;
 
   /* Effects */
-  --ring: 0 0 0 3px rgba(125, 31, 61, 0.28);
+  --ring: 0 0 0 3px rgba(224, 96, 43, 0.30);
   --shadow-sm: 0 1px 2px rgba(33, 28, 21, 0.06), 0 1px 3px rgba(33, 28, 21, 0.05);
   --shadow-md: 0 6px 16px rgba(33, 28, 21, 0.08), 0 2px 5px rgba(33, 28, 21, 0.04);
   --shadow-lg: 0 24px 60px rgba(33, 28, 21, 0.18), 0 8px 20px rgba(33, 28, 21, 0.08);
@@ -83,10 +83,10 @@
     --text-muted:  #A79C88;
     --text-subtle: #7E7461;
 
-    --accent:        #DE7893;
-    --accent-hover:  #E892A8;
-    --accent-ink:    #2B0D16;
-    --accent-soft:   #3D1522;
+    --accent:        #EE7440;
+    --accent-hover:  #F58C5F;
+    --accent-ink:    #1B1206;
+    --accent-soft:   #37241A;
 
     --success:       #6DB78D;
     --success-soft:  #21362A;
@@ -94,7 +94,7 @@
     --danger-hover:  #EE8871;
     --danger-soft:   #3B241D;
 
-    --ring: 0 0 0 3px rgba(222, 120, 147, 0.35);
+    --ring: 0 0 0 3px rgba(238, 116, 64, 0.35);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
@@ -111,7 +111,11 @@ html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg);
+  background:
+    radial-gradient(ellipse 900px 480px at 8% -8%, color-mix(in srgb, var(--accent) 7%, transparent), transparent),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 14px;
@@ -227,10 +231,37 @@ button { font-family: inherit; }
 }
 .back-link:hover { color: var(--accent); }
 
+/* A plain hairline felt a bit bare for a "de Valentine" menu card - add a
+   small centered flourish, like a printed menu's section break. Drawn with
+   a CSS mask (not a unicode glyph) so it renders the same everywhere
+   instead of risking an emoji-font fallback. */
 .section-divider {
-  border: 0;
-  border-top: 1px solid var(--border);
-  margin: 30px 0;
+  position: relative;
+  height: 1px;
+  background: var(--border);
+  margin: 34px 0;
+}
+.section-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 20px;
+  background: var(--bg);
+}
+.section-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 13px;
+  height: 13px;
+  background-color: var(--accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2c-1.2 4.4-4.4 7.6-8.8 8.8 4.4 1.2 7.6 4.4 8.8 8.8 1.2-4.4 4.4-7.6 8.8-8.8-4.4-1.2-7.6-4.4-8.8-8.8z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2c-1.2 4.4-4.4 7.6-8.8 8.8 4.4 1.2 7.6 4.4 8.8 8.8 1.2-4.4 4.4-7.6 8.8-8.8-4.4-1.2-7.6-4.4-8.8-8.8z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 .empty-state {
@@ -490,18 +521,22 @@ button { font-family: inherit; }
 .takeaway-button:active,
 .mini-button:active { transform: translateY(1px); }
 
-/* Primary (accent) */
+/* Primary (accent) - subtle gradient + lift on hover instead of a flat fill,
+   a bit more tactile than a plain solid button. */
 .login-button,
 .takeaway-button {
   height: 44px;
   padding: 0 22px;
-  background: var(--accent);
+  background: linear-gradient(155deg, var(--accent) 15%, var(--accent-hover) 110%);
   color: var(--accent-ink);
   font-size: 14px;
   box-shadow: var(--shadow-sm);
 }
 .login-button:hover,
-.takeaway-button:hover { background: var(--accent-hover); }
+.takeaway-button:hover {
+  background: linear-gradient(155deg, var(--accent-hover) 15%, var(--accent) 110%);
+  box-shadow: var(--shadow-md);
+}
 
 .login-button { margin-top: 24px; width: 100%; }
 
@@ -510,14 +545,17 @@ button { font-family: inherit; }
   margin-top: 22px;
   height: 50px;
   padding: 0 20px;
-  background: var(--accent);
+  background: linear-gradient(155deg, var(--accent) 15%, var(--accent-hover) 110%);
   color: var(--accent-ink);
   font-size: 15px;
   letter-spacing: 0.01em;
   box-shadow: var(--shadow-sm);
 }
-.pay-button:hover { background: var(--accent-hover); }
-.pay-button:disabled { background: var(--border-strong); color: var(--text-subtle); cursor: not-allowed; }
+.pay-button:hover {
+  background: linear-gradient(155deg, var(--accent-hover) 15%, var(--accent) 110%);
+  box-shadow: var(--shadow-md);
+}
+.pay-button:disabled { background: var(--border-strong); color: var(--text-subtle); cursor: not-allowed; box-shadow: none; }
 
 /* Small row action - neutral default */
 .mini-button {
@@ -662,15 +700,19 @@ select.login-input {
 /* ========================================================================= */
 
 .takeaway-section {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 18px;
   padding: 22px 24px;
-  background: var(--accent-soft);
+  background:
+    radial-gradient(ellipse 420px 180px at 100% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent),
+    var(--accent-soft);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
+  overflow: hidden;
 }
 
 .takeaway-title { font-size: 19px; }
@@ -950,7 +992,9 @@ select.login-input {
   align-items: flex-end;
   gap: 3px;
   padding: 16px 24px;
-  background: var(--accent-soft);
+  background:
+    radial-gradient(ellipse 240px 120px at 100% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent),
+    var(--accent-soft);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
 }
