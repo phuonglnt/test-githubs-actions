@@ -21,10 +21,10 @@
   --text-subtle: #A79C89;
 
   /* Brand + status */
-  --accent:        #E0602B;   /* burnt orange / terracotta                 */
-  --accent-hover:  #C64F1F;
+  --accent:        #7D1F3D;   /* wine / burgundy - fits "de Valentine"     */
+  --accent-hover:  #611730;
   --accent-ink:    #FFFFFF;   /* text on accent                           */
-  --accent-soft:   #FBE9DE;   /* tinted background                        */
+  --accent-soft:   #F6E3E9;   /* tinted background                        */
 
   --success:       #3E7B57;
   --success-soft:  #E4EFE7;
@@ -33,7 +33,7 @@
   --danger-soft:   #F9E7E1;
 
   /* Effects */
-  --ring: 0 0 0 3px rgba(224, 96, 43, 0.30);
+  --ring: 0 0 0 3px rgba(125, 31, 61, 0.28);
   --shadow-sm: 0 1px 2px rgba(33, 28, 21, 0.06), 0 1px 3px rgba(33, 28, 21, 0.05);
   --shadow-md: 0 6px 16px rgba(33, 28, 21, 0.08), 0 2px 5px rgba(33, 28, 21, 0.04);
   --shadow-lg: 0 24px 60px rgba(33, 28, 21, 0.18), 0 8px 20px rgba(33, 28, 21, 0.08);
@@ -45,8 +45,9 @@
   --r-lg: 18px;
   --r-pill: 999px;
 
-  --font-ui:   'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Courier New', monospace;
+  --font-ui:      'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', 'Courier New', monospace;
 
   /* legacy token aliases (still referenced by a few rules / inline uses) */
   --paper: var(--surface-2);
@@ -82,10 +83,10 @@
     --text-muted:  #A79C88;
     --text-subtle: #7E7461;
 
-    --accent:        #EE7440;
-    --accent-hover:  #F58C5F;
-    --accent-ink:    #1B1206;
-    --accent-soft:   #37241A;
+    --accent:        #DE7893;
+    --accent-hover:  #E892A8;
+    --accent-ink:    #2B0D16;
+    --accent-soft:   #3D1522;
 
     --success:       #6DB78D;
     --success-soft:  #21362A;
@@ -93,7 +94,7 @@
     --danger-hover:  #EE8871;
     --danger-soft:   #3B241D;
 
-    --ring: 0 0 0 3px rgba(238, 116, 64, 0.35);
+    --ring: 0 0 0 3px rgba(222, 120, 147, 0.35);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
@@ -199,9 +200,10 @@ button { font-family: inherit; }
 
 .page-title {
   margin: 0;
-  font-size: clamp(25px, 3.5vw, 31px);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.5vw, 33px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
   line-height: 1.15;
 }
 
@@ -283,9 +285,11 @@ button { font-family: inherit; }
 }
 
 .topbar__brand {
-  font-weight: 800;
-  font-size: 15.5px;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 17px;
+  letter-spacing: -0.005em;
   color: var(--text);
   text-decoration: none;
 }
@@ -629,9 +633,10 @@ select.login-input {
 
 .login-title {
   margin: 0;
-  font-size: 23px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .login-subtitle {
@@ -895,9 +900,10 @@ select.login-input {
 }
 .receipt__table {
   margin: 0 0 14px;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
 }
 
 .receipt__divider { border-top: 1px solid var(--border-strong); margin: 14px 0; }
