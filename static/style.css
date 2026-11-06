@@ -360,6 +360,64 @@ button { font-family: inherit; }
   gap: 14px;
 }
 
+/* ========================================================================= */
+/* Sidebar - at "full screen" desktop width, Manage staff / Manage menu /    */
+/* Sales report / currency move out of the topbar into a Reddit/Facebook-   */
+/* style left column instead of sitting in a horizontal strip. Below the    */
+/* breakpoint the topbar__nav / currency-switch copies in the topbar (see   */
+/* .topbar-only) are shown instead and this sidebar stays hidden.           */
+/* ========================================================================= */
+
+.sidebar { display: none; }
+
+@media (min-width: 1240px) {
+  .topbar-only { display: none !important; }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: fixed;
+    top: 63px;
+    left: 0;
+    bottom: 0;
+    width: 232px;
+    padding: 22px 18px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+  }
+
+  .sidebar__nav { display: flex; flex-direction: column; gap: 2px; }
+
+  .sidebar__nav-link {
+    display: flex;
+    align-items: center;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 9px 10px;
+    border-radius: var(--r-sm);
+    transition: background 0.14s ease, color 0.14s ease;
+  }
+  .sidebar__nav-link:hover { color: var(--text); background: var(--surface-2); }
+  .sidebar__nav-link .dropdown-icon { color: inherit; }
+
+  .sidebar__divider {
+    border-top: 1px solid var(--border);
+    margin: 14px 0 12px;
+  }
+
+  .sidebar .avatar-dropdown__label { padding: 0 10px; margin-bottom: 8px; }
+  .sidebar .currency-switch { margin: 0 10px; }
+
+  /* Push the page content clear of the fixed sidebar instead of centering
+     under it; .page keeps its own max-width, it just no longer floats to
+     the middle of the whole viewport. */
+  .page { margin-left: 232px; margin-right: auto; }
+}
+
 .topbar__avatar-wrap { position: relative; }
 
 .topbar__avatar {
@@ -996,13 +1054,34 @@ select.login-input {
 }
 .receipt__line {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   font-family: var(--font-mono);
   font-size: 13px;
 }
-.receipt__line-name { color: var(--text); }
+.receipt__line-name { color: var(--text); flex: 1; min-width: 0; }
 .receipt__line-price { color: var(--text-muted); white-space: nowrap; }
+
+/* "x" nhỏ cuối mỗi dòng - lỡ thêm nhầm món thì bấm để xoá hẳn dòng đó */
+.receipt__line-remove {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-subtle);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.receipt__line-remove:hover { background: var(--danger-soft); color: var(--danger); }
 
 .receipt__total {
   display: flex;

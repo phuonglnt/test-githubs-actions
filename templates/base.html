@@ -28,7 +28,7 @@
   <div class="topbar__left">
     <a class="topbar__brand" href="{{ url_for('table_map') }}">Restaurant de Valentine</a>
 
-    <div class="topbar__nav">
+    <div class="topbar__nav topbar-only">
       {% if session.role == 'owner' %}
       <a class="topbar__nav-link" href="{{ url_for('staff_management') }}">{{ t('nav_manage_staff') }}</a>
       <a class="topbar__nav-link" href="{{ url_for('manage_menu') }}">{{ t('nav_manage_menu') }}</a>
@@ -36,7 +36,7 @@
       <a class="topbar__nav-link" href="{{ url_for('reports') }}">{{ t('nav_sales_report') }}</a>
     </div>
 
-    <div class="currency-switch" title="{{ t('nav_currency') }}">
+    <div class="currency-switch topbar-only" title="{{ t('nav_currency') }}">
       {% for c in currencies %}
       <button class="currency-switch__option {{ 'currency-switch__option--active' if c == current_currency }}" data-currency="{{ c }}">{{ c }}</button>
       {% endfor %}
@@ -86,6 +86,38 @@
 
   </div>
 </nav>
+
+<!-- Màn rộng (desktop full screen): nav + chọn tiền tệ chuyển xuống sidebar
+     trái kiểu Reddit/Facebook thay vì nằm ngang cạnh tên quán. Ẩn bằng CSS
+     ở màn hẹp/trung bình, lúc đó bản trong topbar__nav ở trên hiện thay. -->
+<aside class="sidebar">
+  <div class="sidebar__nav">
+    {% if session.role == 'owner' %}
+    <a class="sidebar__nav-link" href="{{ url_for('staff_management') }}">
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="8" r="2.5"/><path d="M15 13.5c2.5.3 4.5 2 4.5 4.5"/></svg>
+      {{ t('nav_manage_staff') }}
+    </a>
+    <a class="sidebar__nav-link" href="{{ url_for('manage_menu') }}">
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a2 2 0 0 0 4 0V3M8 10v11M18 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>
+      {{ t('nav_manage_menu') }}
+    </a>
+    {% endif %}
+    <a class="sidebar__nav-link" href="{{ url_for('reports') }}">
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+      {{ t('nav_sales_report') }}
+    </a>
+  </div>
+
+  <div class="sidebar__divider"></div>
+
+  <p class="avatar-dropdown__label">{{ t('nav_currency') }}</p>
+  <div class="currency-switch currency-switch--stacked" title="{{ t('nav_currency') }}">
+    {% for c in currencies %}
+    <button class="currency-switch__option {{ 'currency-switch__option--active' if c == current_currency }}" data-currency="{{ c }}">{{ c }}</button>
+    {% endfor %}
+  </div>
+</aside>
+
 <script src="{{ url_for('static', filename='topbar.js') }}"></script>
 {% endif %}
 
