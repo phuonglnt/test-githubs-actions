@@ -26,7 +26,7 @@ _STRINGS = {
     "nav_language":          {"en": "Language",              "vi": "Ngôn ngữ",               "fr": "Langue"},
     "nav_theme":             {"en": "Light / dark mode",     "vi": "Chế độ sáng / tối",       "fr": "Mode clair / sombre"},
     "nav_manage_staff":      {"en": "Manage staff",          "vi": "Quản lý nhân viên",       "fr": "Gérer le personnel"},
-    "nav_manage_menu":       {"en": "Manage menu & tables",  "vi": "Quản lý món & bàn",       "fr": "Gérer le menu et les tables"},
+    "nav_manage_menu":       {"en": "Manage menu and tables", "vi": "Quản lý món và bàn",     "fr": "Gérer le menu et les tables"},
     "nav_sales_report":      {"en": "Sales report",          "vi": "Báo cáo doanh thu",       "fr": "Rapport des ventes"},
     "nav_logout":            {"en": "Log out",               "vi": "Đăng xuất",               "fr": "Déconnexion"},
 
@@ -103,7 +103,7 @@ _STRINGS = {
     "stf_none":              {"en": "No staff accounts yet.","vi": "Chưa có tài khoản nhân viên.","fr": "Aucun compte pour l'instant."},
 
     # ---------- Quản lý món & bàn ----------
-    "mm_title":              {"en": "Manage Menu & Tables",  "vi": "Quản lý món & bàn",       "fr": "Gérer le menu et les tables"},
+    "mm_title":              {"en": "Manage Menu and Tables", "vi": "Quản lý món và bàn",     "fr": "Gérer le menu et les tables"},
     "mm_subtitle":           {"en": "Owner-only. Add, edit, or remove dishes and tables. Prices are entered and stored in VND; the currency selector in the top bar only changes how they're displayed elsewhere.",
                               "vi": "Chỉ dành cho chủ. Thêm, sửa hoặc xoá món và bàn. Giá nhập và lưu theo VND; nút chọn tiền tệ trên thanh trên cùng chỉ đổi cách hiển thị ở nơi khác.",
                               "fr": "Réservé au propriétaire. Ajoutez, modifiez ou supprimez des plats et des tables. Les prix sont saisis et stockés en VND ; le sélecteur de devise en haut ne change que l'affichage ailleurs."},

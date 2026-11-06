@@ -48,12 +48,28 @@ class MenuManager(Database):
         self.conn.commit()
 
     def set_menu_item_active(self, menu_id, is_active):
-        """Soft delete / restore a dish. We never hard-delete a dish that may
-        already be referenced by past orders - hiding it keeps old bills intact."""
+        """Soft delete / restore a dish - used to restore one that was hidden."""
         self.cursor.execute(
             "UPDATE Menu SET is_active = ? WHERE ID = ?", (1 if is_active else 0, menu_id)
         )
         self.conn.commit()
+
+    def delete_or_deactivate_menu_item(self, menu_id):
+        """Bấm "Xoá" trên 1 món: thử xoá hẳn khỏi Menu trước. Món chưa từng
+        được gọi trong bill nào (không có Order_info nào tham chiếu) thì xoá
+        sạch luôn - đúng nghĩa với món tạo sai, gõ nhầm giá/tên. Món đã có
+        lịch sử gọi món thì xoá sẽ vi phạm khoá ngoại - lúc đó tự động ẩn
+        (is_active=0) thay vì xoá, để không phá hỏng hoá đơn cũ.
+        Trả về True nếu xoá hẳn, False nếu chỉ ẩn được (do đã có lịch sử)."""
+        try:
+            self.cursor.execute("DELETE FROM Menu WHERE ID = ?", (menu_id,))
+            self.conn.commit()
+            return True
+        except dbcompat.IntegrityError:
+            self.conn.rollback()
+            self.cursor.execute("UPDATE Menu SET is_active = 0 WHERE ID = ?", (menu_id,))
+            self.conn.commit()
+            return False
 
 class TableManager(Database):
     def add_table(self, seat_count, status='available'):

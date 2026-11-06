@@ -74,6 +74,7 @@
 
   <div class="topbar__secondary topbar-only">
     <div class="topbar__nav">
+      <a class="topbar__nav-link" href="{{ url_for('table_map') }}">{{ t('tm_title') }}</a>
       {% if session.role == 'owner' %}
       <a class="topbar__nav-link" href="{{ url_for('staff_management') }}">{{ t('nav_manage_staff') }}</a>
       <a class="topbar__nav-link" href="{{ url_for('manage_menu') }}">{{ t('nav_manage_menu') }}</a>
@@ -94,6 +95,10 @@
      ở màn hẹp/trung bình, lúc đó bản trong topbar__nav ở trên hiện thay. -->
 <aside class="sidebar">
   <div class="sidebar__nav">
+    <a class="sidebar__nav-link" href="{{ url_for('table_map') }}">
+      <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="8" rx="1"/><path d="M3 10l2-5h14l2 5"/></svg>
+      {{ t('tm_title') }}
+    </a>
     {% if session.role == 'owner' %}
     <a class="sidebar__nav-link" href="{{ url_for('staff_management') }}">
       <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="8" r="2.5"/><path d="M15 13.5c2.5.3 4.5 2 4.5 4.5"/></svg>

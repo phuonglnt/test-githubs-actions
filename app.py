@@ -246,7 +246,7 @@ def manage_menu():
 
         elif action == "deactivate_dish":
             menu_id = request.form.get("menu_id")
-            menu_mgr.set_menu_item_active(menu_id, is_active=False)
+            menu_mgr.delete_or_deactivate_menu_item(menu_id)
 
         elif action == "reactivate_dish":
             menu_id = request.form.get("menu_id")
