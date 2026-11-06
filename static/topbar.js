@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Đổi tiền tệ hiển thị -> load lại trang để mọi số tiền hiện đúng đơn vị mới
-  document.querySelectorAll(".currency-option").forEach((btn) => {
+  document.querySelectorAll(".currency-switch__option").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       e.stopPropagation();
       const currency = btn.dataset.currency;
