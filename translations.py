@@ -67,6 +67,10 @@ _STRINGS = {
                               "vi": "Không hoàn tất được thanh toán.",
                               "fr": "Impossible de finaliser le paiement."},
     "ord_pay_success":       {"en": "Payment successful:",   "vi": "Thanh toán thành công:",  "fr": "Paiement réussi :"},
+    "ord_remove_item":       {"en": "Remove from order",     "vi": "Xoá khỏi phiếu",          "fr": "Retirer de la commande"},
+    "ord_remove_failed":     {"en": "Couldn't remove the item. Please try again.",
+                              "vi": "Không xoá được món. Vui lòng thử lại.",
+                              "fr": "Impossible de retirer l'article. Veuillez réessayer."},
 
     # ---------- Báo cáo ----------
     "rep_title":             {"en": "Sales Report",          "vi": "Báo cáo doanh thu",       "fr": "Rapport des ventes"},

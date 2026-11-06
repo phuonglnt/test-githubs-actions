@@ -38,7 +38,9 @@
     <aside class="receipt" data-bill-id="{{ bill_id }}"
            data-i18n-add-failed="{{ t('ord_add_failed') }}"
            data-i18n-pay-failed="{{ t('ord_pay_failed') }}"
-           data-i18n-pay-success="{{ t('ord_pay_success') }}">
+           data-i18n-pay-success="{{ t('ord_pay_success') }}"
+           data-i18n-remove-failed="{{ t('ord_remove_failed') }}"
+           data-i18n-remove-item="{{ t('ord_remove_item') }}">
       <div class="receipt__perforation"></div>
       <div class="receipt__body">
         <p class="receipt__label">
@@ -54,6 +56,7 @@
           <li class="receipt__line">
             <span class="receipt__line-name">{{ item['name_dish'] }} &times;{{ item['dish_quantity'] }}</span>
             <span class="receipt__line-price">{{ format_money(item['total_dish']) }}</span>
+            <button class="receipt__line-remove" data-menu-id="{{ item['menu_id'] }}" title="{{ t('ord_remove_item') }}" aria-label="{{ t('ord_remove_item') }}">&times;</button>
           </li>
           {% endfor %}
         </ul>

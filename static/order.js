@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
     addFailed: receipt.dataset.i18nAddFailed,
     payFailed: receipt.dataset.i18nPayFailed,
     paySuccess: receipt.dataset.i18nPaySuccess,
+    removeFailed: receipt.dataset.i18nRemoveFailed,
+    removeItem: receipt.dataset.i18nRemoveItem,
   };
 
   const itemsList = document.getElementById("receipt-items");
@@ -25,10 +27,34 @@ document.addEventListener("DOMContentLoaded", () => {
       li.innerHTML = `
         <span class="receipt__line-name">${item.name_dish} &times;${item.dish_quantity}</span>
         <span class="receipt__line-price">${item.total_dish_formatted}</span>
+        <button class="receipt__line-remove" data-menu-id="${item.menu_id}" title="${MSG.removeItem}" aria-label="${MSG.removeItem}">&times;</button>
       `;
       itemsList.appendChild(li);
     });
   }
+
+  // Lỡ thêm nhầm món -> bấm nút "x" trên từng dòng để xoá hẳn món đó khỏi
+  // phiếu. Dùng event delegation vì các dòng được render lại liên tục.
+  itemsList.addEventListener("click", async (e) => {
+    const removeBtn = e.target.closest(".receipt__line-remove");
+    if (!removeBtn) return;
+
+    const menuId = removeBtn.dataset.menuId;
+    const res = await fetch(`/api/bill/${billId}/remove_item`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ menu_id: menuId }),
+    });
+
+    if (!res.ok) {
+      showToast(MSG.removeFailed, "error");
+      return;
+    }
+
+    const data = await res.json();
+    renderItems(data.items);
+    totalEl.textContent = data.total_formatted;
+  });
 
   // Click a dish card -> call the API to add it to the current bill
   document.querySelectorAll(".dish-card").forEach((card) => {

@@ -159,6 +159,15 @@ class BillManager(Database):
 
         self.conn.commit()
 
+    def remove_item_from_bill(self, bill_id, menu_id):
+        """Bỏ hẳn 1 món khỏi bill - dùng khi lỡ thêm nhầm món. Xoá cả dòng
+        (mọi số lượng của món đó trên bill này), không phải giảm dần từng
+        cái một."""
+        self.cursor.execute(
+            "DELETE FROM Order_info WHERE bill_id = ? AND menu_id = ?", (bill_id, menu_id)
+        )
+        self.conn.commit()
+
     def get_open_bill_for_table(self, table_id):
         """Find the UNPAID bill for a table (if it currently has an order in progress)."""
         self.cursor.execute(
@@ -174,7 +183,7 @@ class BillManager(Database):
 
     def get_bill_details(self, bill_id):
         self.cursor.execute("""
-            SELECT Menu.name_dish, SUM(Order_info.dish_quantity) AS dish_quantity, SUM(Order_info.total_dish) AS total_dish
+            SELECT Order_info.menu_id, Menu.name_dish, SUM(Order_info.dish_quantity) AS dish_quantity, SUM(Order_info.total_dish) AS total_dish
             FROM Order_info
             JOIN Menu ON Order_info.menu_id = Menu.ID
             WHERE Order_info.bill_id = ?

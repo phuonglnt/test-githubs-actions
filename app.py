@@ -466,6 +466,34 @@ def add_item(bill_id):
     return jsonify({
         "items": [
             {
+                "menu_id": r["menu_id"],
+                "name_dish": r["name_dish"],
+                "dish_quantity": r["dish_quantity"],
+                "total_dish_formatted": format_money(r["total_dish"]),
+            }
+            for r in items
+        ],
+        "total_formatted": format_money(total),
+    })
+
+
+@app.route("/api/bill/<int:bill_id>/remove_item", methods=["POST"])
+@login_required
+def remove_item(bill_id):
+    """Bỏ hẳn 1 món khỏi bill - dùng khi lỡ thêm nhầm món."""
+    data = request.get_json()
+    menu_id = data.get("menu_id")
+
+    bill_mgr = BillManager()
+    bill_mgr.remove_item_from_bill(bill_id, menu_id)
+    items = bill_mgr.get_bill_details(bill_id)
+    total = bill_mgr.calculate_total_bill(bill_id)
+    bill_mgr.close()
+
+    return jsonify({
+        "items": [
+            {
+                "menu_id": r["menu_id"],
                 "name_dish": r["name_dish"],
                 "dish_quantity": r["dish_quantity"],
                 "total_dish_formatted": format_money(r["total_dish"]),
