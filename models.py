@@ -166,6 +166,21 @@ class BillManager(Database):
         self.cursor.execute(
             "DELETE FROM Order_info WHERE bill_id = ? AND menu_id = ?", (bill_id, menu_id)
         )
+
+        # Nếu đó là món cuối cùng, bill rỗng trở lại - trả bàn về "available"
+        # (add_item_to_bill là nơi chuyển sang "in_use", nên gỡ hết món thì
+        # cũng phải tự đảo ngược lại, không được để treo "Occupied" trên bàn
+        # không còn món nào).
+        self.cursor.execute("SELECT COUNT(*) AS cnt FROM Order_info WHERE bill_id = ?", (bill_id,))
+        remaining = self.cursor.fetchone()["cnt"]
+        if remaining == 0:
+            self.cursor.execute("SELECT table_id FROM Bill WHERE Bill_id = ?", (bill_id,))
+            bill_row = self.cursor.fetchone()
+            if bill_row and bill_row["table_id"] is not None:
+                self.cursor.execute(
+                    "UPDATE Table_info SET status = 'available' WHERE Table_number = ?", (bill_row["table_id"],)
+                )
+
         self.conn.commit()
 
     def get_open_bill_for_table(self, table_id):
