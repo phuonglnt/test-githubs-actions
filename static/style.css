@@ -305,23 +305,31 @@ button { font-family: inherit; }
   position: sticky;
   top: 0;
   z-index: 50;
-  min-height: 62px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px 24px;
-  padding: 10px 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   color: var(--text);
 }
 
-.topbar__left {
+/* Row 1: brand + account controls (language, theme, avatar) - these never
+   separate from each other, no matter how narrow the window gets. */
+.topbar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 62px;
+  padding: 10px 24px;
+}
+
+/* Row 2 (below the sidebar breakpoint only): Manage staff / Manage menu /
+   Sales report + currency - this is the part that wraps onto its own line
+   when the window is too narrow, never the account controls above. */
+.topbar__secondary {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px 18px;
+  padding: 0 24px 12px;
 }
 
 .topbar__brand {
