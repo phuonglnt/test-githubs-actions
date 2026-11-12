@@ -128,6 +128,11 @@
 <script src="{{ url_for('static', filename='topbar.js') }}"></script>
 {% endif %}
 
+<!-- Màn rộng: khung này trở thành 1 "mảnh" bo góc riêng, tách khỏi sidebar
+     bằng khoảng trống nhỏ (kiểu Messenger/Facebook) - xem .content-shell.
+     Màn hẹp: không có style gì thêm, chỉ là 1 div trung tính. -->
+<div class="content-shell {{ 'content-shell--app' if session.user_id }}">
 {% block content %}{% endblock %}
+</div>
 </body>
 </html>
