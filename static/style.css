@@ -384,14 +384,19 @@ button { font-family: inherit; }
 @media (min-width: 1240px) {
   .topbar-only { display: none !important; }
 
+  /* Khoá cuộn ở body - 2 "mảnh" bên dưới tự cuộn riêng bên trong chúng,
+     khung/viền/bo góc của chúng đứng yên một chỗ như cửa sổ, không bị kéo
+     trôi theo khi cuộn xem nội dung (kiểu Messenger). */
+  body.app-shell { height: 100vh; overflow: hidden; }
+
   .sidebar {
     display: flex;
     flex-direction: column;
     gap: 4px;
     position: fixed;
-    top: 77px;
-    left: 14px;
-    bottom: 14px;
+    top: 71px;
+    left: 8px;
+    bottom: 8px;
     width: 224px;
     padding: 20px 16px;
     background: var(--surface);
@@ -425,15 +430,20 @@ button { font-family: inherit; }
   .sidebar .avatar-dropdown__label { padding: 0 10px; margin-bottom: 8px; }
   .sidebar .currency-switch { margin: 0 10px; }
 
-  /* "Mảnh" thứ 2: toàn bộ nội dung trang, bo góc + có viền riêng, tách
-     khỏi sidebar bằng khoảng trống thay vì dính liền margin-left trơn. */
+  /* "Mảnh" thứ 2: khung đứng yên như sidebar (cùng fixed, cùng top/bottom),
+     chỉ NỘI DUNG bên trong nó mới cuộn - viền/bo góc/nền không bao giờ
+     trôi đi khi cuộn xem thêm bàn/món. */
   .content-shell--app {
-    margin: 14px 14px 14px calc(224px + 14px + 14px);
+    position: fixed;
+    top: 71px;
+    left: calc(224px + 16px);
+    right: 8px;
+    bottom: 8px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
     box-shadow: var(--shadow-sm);
-    min-height: calc(100vh - 77px - 14px);
+    overflow-y: auto;
   }
 
   .content-shell--app .page { margin: 0 auto; }
