@@ -394,14 +394,14 @@ button { font-family: inherit; }
     flex-direction: column;
     gap: 4px;
     position: fixed;
-    top: 71px;
-    left: 8px;
-    bottom: 8px;
+    top: 67px;
+    left: 4px;
+    bottom: 4px;
     width: 224px;
     padding: 20px 16px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--r-lg);
+    border-radius: var(--r-xs);
     box-shadow: var(--shadow-sm);
     overflow-y: auto;
   }
@@ -435,13 +435,13 @@ button { font-family: inherit; }
      trôi đi khi cuộn xem thêm bàn/món. */
   .content-shell--app {
     position: fixed;
-    top: 71px;
-    left: calc(224px + 16px);
-    right: 8px;
-    bottom: 8px;
+    top: 67px;
+    left: calc(224px + 8px);
+    right: 4px;
+    bottom: 4px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--r-lg);
+    border-radius: var(--r-xs);
     box-shadow: var(--shadow-sm);
     overflow-y: auto;
   }
